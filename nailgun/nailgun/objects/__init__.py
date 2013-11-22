@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 #    Copyright 2013 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -14,20 +12,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from sqlalchemy import Column
-from sqlalchemy import Enum
-from sqlalchemy import Integer
-from sqlalchemy import String
+from nailgun.objects.base import NailgunObject
 
-from nailgun.api.models.base import Base
-
-
-class Plugin(Base):
-    __tablename__ = 'plugins'
-    TYPES = ('nailgun', 'fuel')
-
-    id = Column(Integer, primary_key=True)
-    type = Column(Enum(*TYPES, name='plugin_type'), nullable=False)
-    name = Column(String(128), nullable=False, unique=True)
-    state = Column(String(128), nullable=False, default='registered')
-    version = Column(String(128), nullable=False)
+from nailgun.objects.release import Release

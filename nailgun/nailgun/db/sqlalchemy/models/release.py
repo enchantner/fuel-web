@@ -23,10 +23,12 @@ from sqlalchemy import UniqueConstraint
 
 from sqlalchemy.orm import relationship
 
-from nailgun.api.models.base import Base
-from nailgun.api.models.fields import JSON
-from nailgun.api.models.node import Role
+import nailgun.consts as consts
+
 from nailgun.db import db
+from nailgun.db.sqlalchemy.models.base import Base
+from nailgun.db.sqlalchemy.models.fields import JSON
+from nailgun.db.sqlalchemy.models.node import Role
 
 
 class Release(Base):
@@ -45,9 +47,11 @@ class Release(Base):
     version = Column(String(30), nullable=False)
     description = Column(Unicode)
     operating_system = Column(String(50), nullable=False)
-    state = Column(Enum(*STATES, name='release_state'),
-                   nullable=False,
-                   default='not_available')
+    state = Column(
+        Enum(*consts.RELEASE_STATES, name='release_state'),
+        nullable=False,
+        default='not_available'
+    )
     networks_metadata = Column(JSON, default=[])
     attributes_metadata = Column(JSON, default={})
     volumes_metadata = Column(JSON, default={})

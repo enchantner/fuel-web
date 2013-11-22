@@ -22,14 +22,18 @@ import json
 
 import web
 
+from nailgun.api.handlers.base import CollectionHandler
 from nailgun.api.handlers.base import content_json
 from nailgun.api.handlers.base import JSONHandler
-from nailgun.api.models import Release
+from nailgun.api.handlers.base import ObjectHandler
 from nailgun.api.validators.release import ReleaseValidator
 from nailgun.db import db
+from nailgun.db.sqlalchemy.models import Release
+
+from nailgun.objects.release import Release
 
 
-class ReleaseHandler(JSONHandler):
+class ReleaseHandler(ObjectHandler):
     """Release single handler
     """
 
@@ -46,15 +50,6 @@ class ReleaseHandler(JSONHandler):
     )
     model = Release
     validator = ReleaseValidator
-
-    @content_json
-    def GET(self, release_id):
-        """:returns: JSONized Release object.
-        :http: * 200 (OK)
-               * 404 (release not found in db)
-        """
-        release = self.get_object_or_404(Release, release_id)
-        return self.render(release)
 
     @content_json
     def PUT(self, release_id):
@@ -87,37 +82,9 @@ class ReleaseHandler(JSONHandler):
         )
 
 
-class ReleaseCollectionHandler(JSONHandler):
+class ReleaseCollectionHandler(CollectionHandler):
     """Release collection handler
     """
 
+    model = Release
     validator = ReleaseValidator
-
-    @content_json
-    def GET(self):
-        """:returns: Collection of JSONized Release objects.
-        :http: * 200 (OK)
-        """
-        return map(
-            ReleaseHandler.render,
-            db().query(Release).all()
-        )
-
-    @content_json
-    def POST(self):
-        """:returns: JSONized Release object.
-        :http: * 201 (cluster successfully created)
-               * 400 (invalid cluster data specified)
-               * 409 (release with such parameters already exists)
-        """
-        data = self.checked_data()
-
-        release = Release()
-        for key, value in data.iteritems():
-            setattr(release, key, value)
-        db().add(release)
-        db().commit()
-        raise web.webapi.created(json.dumps(
-            ReleaseHandler.render(release),
-            indent=4
-        ))

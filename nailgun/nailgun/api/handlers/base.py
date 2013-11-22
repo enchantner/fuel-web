@@ -69,7 +69,7 @@ handlers = {}
 class HandlerRegistrator(type):
     def __init__(cls, name, bases, dct):
         super(HandlerRegistrator, cls).__init__(name, bases, dct)
-        if hasattr(cls, 'model'):
+        if hasattr(cls, 'model') and cls.model:
             key = cls.model.__name__
             if key in handlers:
                 logger.warning("Handler for %s already registered" % key)
@@ -137,4 +137,42 @@ class JSONHandler(object):
         else:
             if log_get:
                 getattr(logger, log_get[0])(log_get[1])
+        return obj
+
+
+class CollectionHandler(JSONHandler):
+
+    model = None
+
+    @content_json
+    def GET(self):
+        return list(self.model.get_all())
+
+    @content_json
+    def POST(self):
+        data = self.checked_data()
+        new_obj = self.model(**data)
+        raise web.webapi.created(
+            json.dumps(new_obj.save())
+        )
+
+
+class ObjectHandler(JSONHandler):
+
+    model = None
+
+    @content_json
+    def GET(self, obj_id):
+        obj = self.model.get_by_uid(obj_id)
+        if not obj:
+            raise web.notfound()
+        return obj
+
+    @content_json
+    def PUT(self, obj_id):
+        data = self.checked_data()
+        obj = self.model.get_by_uid(obj_id)
+        if not obj:
+            raise web.notfound()
+        obj.update(**data)
         return obj
