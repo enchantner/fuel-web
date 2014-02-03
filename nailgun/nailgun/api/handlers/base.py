@@ -52,7 +52,10 @@ def forbid_client_caching(handler):
 @decorator
 def content_json(func, *args, **kwargs):
     web.header('Content-Type', 'application/json')
-    data = func(*args, **kwargs)
+    try:
+        data = func(*args, **kwargs)
+    except web.HTTPError as http_error:
+        return build_json_response(http_error.data)
     return build_json_response(data)
 
 
