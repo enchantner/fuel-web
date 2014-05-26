@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 #    Copyright 2014 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -14,13 +12,19 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import os
-import sys
+import pecan
 
-sys.path.insert(0, os.path.dirname(__file__))
+from nailgun.api.v1.validators.release import ReleaseValidator
+from nailgun.api.v2.controllers.base import BaseController
 
-from nailgun.app import build_wsgi_app
-from nailgun.app import build_middleware
+from nailgun.objects import Release
+from nailgun.objects import ReleaseCollection
 
 
-application = build_middleware(build_wsgi_app())
+class ReleaseController(BaseController):
+    """Release single handler
+    """
+
+    single = Release
+    collection = ReleaseCollection
+    validator = ReleaseValidator

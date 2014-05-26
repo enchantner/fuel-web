@@ -155,11 +155,13 @@ class TestAttributes(BaseIntegrationTest):
                 kwargs={'cluster_id': cluster['id']}),
             headers=self.default_headers
         )
+        print resp.body
         self.assertEquals(200, resp.status_code)
         self.assertEquals(
             json.loads(resp.body)['editable'],
             release.attributes_metadata['editable']
         )
+        raise
 
     def test_attributes_set_defaults(self):
         cluster = self.env.create_cluster(api=True)

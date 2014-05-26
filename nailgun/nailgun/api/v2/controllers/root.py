@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 #    Copyright 2014 Mirantis, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -14,13 +12,25 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import os
-import sys
+import pecan
+from webob.exc import status_map
 
-sys.path.insert(0, os.path.dirname(__file__))
+from nailgun.api.v2.controllers.base import BaseController
 
-from nailgun.app import build_wsgi_app
-from nailgun.app import build_middleware
+from nailgun.api.v2.controllers.release import ReleaseController
+from nailgun.api.v2.controllers.cluster import ClusterController
 
 
-application = build_middleware(build_wsgi_app())
+class APIController(BaseController):
+
+    releases = ReleaseController()
+    clusters = ClusterController()
+
+
+class RootController(object):
+
+    api = APIController()
+
+    @pecan.expose('jinja:index.html')
+    def index(self):
+        return dict()
